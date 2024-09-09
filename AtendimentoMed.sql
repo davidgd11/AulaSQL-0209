@@ -23,12 +23,16 @@ CREATE TABLE MEDICO(
         CONSTRAINT pk_cod_med PRIMARY KEY,
     NOME VARCHAR2(50) NOT NULL,
     TITULO VARCHAR2(10),
-    CRM NUMBER(6) 
-        CONSTRAINT uk_crm UNIQUE,
-    UF_CRM VARCHAR2(2) 
-        CONSTRAINT uk_uf_crm UNIQUE,
+    CRM NUMBER(6),
+    UF_CRM VARCHAR2(2),
     COD_ESPEC NUMBER(3) NOT NULL
-        CONSTRAINT fk_cod_espec REFERENCES ESPECIALIDADE 
+    CONSTRAINT uk_med_crm 
+        UNIQUE(
+                CRM, UF_CRM
+        ),
+    CONSTRAINT fk_med_espec
+        FOREIGN KEY (COD_ESPEC)
+        REFERENCES especialidade (COD_ESPEC)
 );
 
 CREATE TABLE PACIENTE(
@@ -45,16 +49,19 @@ CREATE TABLE PACIENTE(
 
 
 CREATE TABLE ATENDIMENTO(
-    COD_PAC NUMBER(7) 
-        CONSTRAINT fk-cod_pac REFERENCES PACIENTE,
-    COD_MED NUMBER(4) 
-        CONSTRAINT fk_cod_med REFERENCES MEDICO,
+    COD_PAC NUMBER(7), 
+    COD_MED NUMBER(4),
     DT_ATEND DATE,
-        CONSTRAINT pk_atendimento PRIMARY KEY (COD_PAC, 
-            COD_MED,
-            DT_ATEND),
     DT_RETORNO DATE,
     PRECO NUMBER(7,2) 
         CONSTRAINT ck_preco_atend CHECK (PRECO >= 0),
-    OBS VARCHAR2(500)
+    OBS VARCHAR2(500),
+    CONSTRAINT pk_atend
+        PRIMARY KEY (COD_PAC, COD_MED, DT_ATEND),
+    CONSTRAINT fk_atend_pac
+        FOREIGN KEY(COD_PAC)
+        REFERENCES paciente (COD_PAC),
+    CONSTRAINT fk_atend_med
+        FOREIGN KEY (COD_MED)
+        REFERENCES medico (COD_MED)
 );
